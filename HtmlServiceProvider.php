@@ -1,6 +1,6 @@
 <?php
 
-namespace Hpkns\Html\Providers;
+namespace Hpkns\Html;
 
 use Collective\Html\HtmlServiceProvider as ServiceProvider;
 
