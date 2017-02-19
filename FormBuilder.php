@@ -35,14 +35,14 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function group($id, $label, $content, $options = [], $checkbox = false)
     {
-        $class_base = 'form-group';
+        $class_base = 'form__group';
         $classes = [$class_base];
 
         if ($error = $this->getError($id)) {
-            $options = $this->addClassToOptions($options, 'form-control form-control--invalid');
+            $options = $this->addClassToOptions($options, 'form__control form__control--invalid');
             $classes[] = "{$class_base}--with-errors";
         } else {
-            $options = $this->addClassToOptions($options, 'form-control');
+            $options = $this->addClassToOptions($options, 'form__control');
         }
 
         if (array_key_exists('required', $options) || in_array('required', $options)) {
