@@ -5,26 +5,6 @@ namespace Hpkns\Html;
 class FormBuilder extends \Collective\Html\FormBuilder
 {
     /**
-     * The template used to format form groups.
-     *
-     * @var string
-     */
-     protected $groupTemplate = '';
-
-    /**
-     * Return the first error (if any) for a given id.
-     *
-     * @param  string  $id
-     * @return \Illuminate\Support\HtmlString
-     */
-    public function getError($id)
-    {
-        if (session()->has('errors') && session('errors')->has($id)) {
-            return $this->toHtmlString('<span class="form-error">' . session('errors')->first($id) . '</span>');
-        }
-    }
-
-    /**
      * Create a form group.
      *
      * @param  string   $id
@@ -33,48 +13,9 @@ class FormBuilder extends \Collective\Html\FormBuilder
      * @param  array    $options
      * @return \Illuminate\Support\HtmlString
      */
-    public function group($id, $label, $content, $options = [], $checkbox = false)
+    public function group($id, $label, $content, $options = [])
     {
-        $class_base = 'form__group';
-        $classes = [$class_base];
-
-        if ($error = $this->getError($id)) {
-            $options = $this->addClassToOptions($options, 'form__control form__control--invalid');
-            $classes[] = "{$class_base}--with-errors";
-        } else {
-            $options = $this->addClassToOptions($options, 'form__control');
-        }
-
-        if (array_key_exists('required', $options) || in_array('required', $options)) {
-            $classes[] = "{$class_base}--required";
-        }
-
-        $classes = implode(' ', $classes);
-
-        if ($checkbox) {
-            $label = "<label style=\"font-weight:normal\">". $content($this, $id, $options) . " <span>{$label}</span>{$error}</label>";
-            $content = '';
-        } else {
-            $label   = "<div class=\"{$class_base}__label\">" . $this->label($id, $label) . '</div>';
-            $content = "<div class=\"{$class_base}__input\">" . $content($this, $id, $options) . "{$error}</div>";
-        }
-
-        return $this->toHtmlString("<div class=\"{$classes}\">{$label}{$content}</div>");
-    }
-
-
-    /**
-     * Add a class within an attributes array.
-     *
-     * @param  array $options
-     * @return array
-     */
-    public function addClassToOptions($options, $class)
-    {
-        return array_set($options, 'class', implode(' ', array_merge(
-            explode(' ', array_get($options, 'class', '')),
-            explode(' ', $class)
-        )));
+        return new FormGroup($id, $label, $content, $options);
     }
 
     /**
@@ -107,7 +48,7 @@ class FormBuilder extends \Collective\Html\FormBuilder
     {
         return $this->group($id, $label, function ($builder, $id, $options) use ($default) {
             return $builder->checkbox($id, '1', $default, []);
-        }, $options, true);
+        }, $options)->checkbox();
     }
 
     /**
