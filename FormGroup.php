@@ -21,30 +21,13 @@ class FormGroup implements Htmlable
     protected $form;
 
     /**
-     * The base for the group class.
+     * Initialize the group.
      *
-     * @var string
+     * @param Hpkns\Html\FormBuilder $builder
      */
-    public $classBase = 'form__group';
-
-    /**
-     * The base for the control class.
-     *
-     * @var string
-     */
-    public $controlClassBase = 'form__control';
-
-    /**
-     *
-     */
-    public $errorFormat = '<span class="form__error">:error</span>';
-
-    public $legendFormat = '<span class="form__legend">:legend</span>';
-    /**
-     *
-     */
-    public function __construct($id, $label, $content, $options)
+    public function __construct(FormBuilder $builder, $id, $label, $content, $options)
     {
+        $this->builder = $builder;
         $this->setAttributes(compact('id', 'label', 'content', 'options'));
 
         $this->form = app('form');
@@ -178,10 +161,10 @@ class FormGroup implements Htmlable
 
     public function getControllClassAttribute()
     {
-        $class = [$this->controlClassBase];
+        $class = [$this->builder->controlClassBase];
 
         if ($this->has_error) {
-            $class[] = "{$this->controlClassBase}--invalid";
+            $class[] = "{$this->builder->controlClassBase}--invalid";
         }
 
         $class = array_merge($class, $this->attributes['attributes']);
@@ -191,10 +174,10 @@ class FormGroup implements Htmlable
 
     public function getGroupClassAttribute()
     {
-        $class = [$this->classBase];
+        $class = [$this->builder->classBase];
 
         if ($this->has_error) {
-            $class[] = "{$this->classBase}--with-errors";
+            $class[] = "{$this->builder->classBase}--with-errors";
         }
 
         return $class;
@@ -204,10 +187,10 @@ class FormGroup implements Htmlable
     {
         $options = $this->attributes['options'];
 
-        $class = [$this->controlClassBase];
+        $class = [$this->builder->controlClassBase];
 
         if ($this->has_error) {
-            $class[] = "{$this->controlClassBase}--invalid";
+            $class[] = "{$this->builder->controlClassBase}--invalid";
         }
 
         if ($this->required) {
@@ -236,8 +219,8 @@ class FormGroup implements Htmlable
             $html = "<label style=\"font-weight:normal\">{$content} <span>{$this->label}</span>{$error}</label>";
         } else {
             $label = $this->form->label($this->id, $this->label);
-            $html  = "<div class=\"{$this->classBase}__label\">{$label}</div>";
-            $html .= "<div class=\"{$this->classBase}__input\">{$content}{$legend}{$error}</div>";
+            $html  = "<div class=\"{$this->builder->classBase}__label\">{$label}</div>";
+            $html .= "<div class=\"{$this->builder->classBase}__input\">{$content}{$legend}{$error}</div>";
         }
 
         return "<div{$attributes}>{$html}</div>";

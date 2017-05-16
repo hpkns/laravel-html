@@ -5,6 +5,51 @@ namespace Hpkns\Html;
 class FormBuilder extends \Collective\Html\FormBuilder
 {
     /**
+     * The base for the group class.
+     *
+     * @var string
+     */
+    public $classBase;
+
+    /**
+     * The base for the control class.
+     *
+     * @var string
+     */
+    public $controlClassBase;
+
+    /**
+     * The format for the form error feedback.
+     *
+     * @var string
+     */
+    public $errorFormat;
+
+    /**
+     * The format for the form field legend.
+     *
+     * @var string
+     */
+    public $legendFormat;
+
+    /**
+     * Initialize the formats.
+     *
+     * @param  string $class_base
+     * @param  string $control_class_base
+     * @param  string $error_format
+     * @param  string $legend_format
+     * @return void
+     */
+    public function setTemplates($class_base, $control_class_base, $error_format, $legend_format)
+    {
+        $this->classBase = $class_base;
+        $this->controlClassBase = $control_class_base;
+        $this->errorFormat = $error_format;
+        $this->legendFormat = $legend_format;
+    }
+
+    /**
      * Create a form group.
      *
      * @param  string   $id
@@ -15,7 +60,7 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function group($id, $label, $content, $options = [])
     {
-        return new FormGroup($id, $label, $content, $options);
+        return new FormGroup($this, $id, $label, $content, $options);
     }
 
     /**
