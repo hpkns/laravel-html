@@ -97,6 +97,7 @@ class FormGroup implements Htmlable
     public function legend($text)
     {
         $this->attributes['legend'] = $text;
+
         return $this;
     }
 
@@ -153,12 +154,22 @@ class FormGroup implements Htmlable
     }
 
 
+    /**
+     * Return the error attributes.
+     *
+     * @return string
+     */
     public function getHasErrorAttribute()
     {
         return session()->has('errors')
             && session('errors')->has($this->attributes['id']);
     }
 
+    /**
+     * Return the controller class attribute.
+     *
+     * @return string
+     */
     public function getControllClassAttribute()
     {
         $class = [$this->builder->controlClassBase];
@@ -172,6 +183,11 @@ class FormGroup implements Htmlable
         return $class;
     }
 
+    /**
+     * Return the class attribute.
+     *
+     * @return array
+     */
     public function getGroupClassAttribute()
     {
         $class = [$this->builder->classBase];
@@ -183,6 +199,11 @@ class FormGroup implements Htmlable
         return $class;
     }
 
+    /**
+     * Return the options attribute.
+     *
+     * @return array
+     */
     public function getOptionsAttribute()
     {
         $options = $this->attributes['options'];

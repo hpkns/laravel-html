@@ -2,11 +2,21 @@
 
 namespace Hpkns\Html;
 
-use Collective\Html\HtmlServiceProvider;
+use Collective\Html\HtmlServiceProvider as BaseProvider;
 
-class HtmlServiceProvider extends HtmlServiceProvider
+class HtmlServiceProvider extends BaseProvider
 {
-    protected $defer = false;
+    /**
+     * Bootstrap any application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__ . '/../config/html.php' => config_path('html.php')
+        ], 'config');
+    }
 
     /**
      * Register the form builder instance.
