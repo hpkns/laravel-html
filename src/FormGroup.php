@@ -3,248 +3,154 @@
 namespace Hpkns\Html;
 
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Session\SessionManager;
 
 class FormGroup implements Htmlable
 {
     /**
-     * The attributes, like in an Eloquent model...
+     * The id of the field.
      *
-     * @var array
+     * @var string
      */
-    protected $attributes = [];
+    protected $name;
 
     /**
-     * A form builder.
+     * The label to the field.
      *
-     * @var Hpkns\Html\FormBuilder
+     * @var string
      */
-    protected $form;
+    protected $label;
+
+    /**
+     * The field at the heart of the content.
+     *
+     * @var FormField
+     */
+    protected $field;
+
+    /**
+     * If the field required?
+     *
+     * @var bool
+     */
+    protected $required = false;
+
+    /**
+     * The fields error.
+     *
+     * @var string|null
+     */
+    protected $error;
+
+    /**
+     * Session used to find errors.
+     *
+     * @var \Illuminate\Session\Store
+     */
+    protected $session;
 
     /**
      * Initialize the group.
      *
-     * @param Hpkns\Html\FormBuilder $builder
+     * @param string $name
+     * @param string $label
+     * @param mixed  $content
+     * @param array  $attributes
      */
-    public function __construct(FormBuilder $builder, $id, $label, $content, $options)
+    public function __construct($name, $label, $content, $default = null, array $attributes = [], SessionManager $session = null)
     {
-        $this->builder = $builder;
-        $this->setAttributes(compact('id', 'label', 'content', 'options'));
+        $this->name = $name;
+        $this->label = $label;
+        $this->field = (new FormField($name, $content, $default, $attributes))
+            ->addClass(config('control_class', 'form__control'));
+        $this->session = $session ?: app('session.store');
 
-        $this->form = app('form');
+        $this->checkForError();
     }
 
     /**
-     * Return the first error (if any) for a given id.
+     * It there an error with the field?
      *
-     * @param  string  $id
-     * @return \Illuminate\Support\HtmlString
+     * @return string|null
      */
-    public function getError($id)
+    public function getError($name)
     {
-        if (session()->has('errors') && session('errors')->has($id)) {
-            return str_replace(':error', session('errors')->first($id), $this->errorFormat);
+        if ($error = session('errors')) {
+            return $error->first($name);
         }
     }
 
     /**
-     * Set a bunch of attributes in one batch.
+     * Check if the fields contains error.
      *
-     * @param  array $attributes
-     * @return $this
-     */
-    public function setAttributes($attributes)
-    {
-        foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
-        }
-    }
-    /**
-     * Set an attribute, à la Eloquent.
-     *
-     * @param  string $key
-     * @param  mixed  $value
      * @return void
      */
-    public function setAttribute($key, $value)
+    public function checkForError()
     {
-        $method = camel_case("set_{$key}_attribute");
-
-        if (method_exists($this, $method)) {
-            $this->$method($value);
-        } else {
-            array_set($this->attributes, $key, $value);
-        }
+        $this->error = $this->getError($this->name);
     }
 
     /**
-     * Mark the field as required.
+     * Set the field label.
      *
-     * @return $this
+     * @param  string $label
+     * @return void
      */
-    public function required()
+    public function label($label)
     {
-        $this->required = true;
-
-        return $this;
+        $this->label = $label;
     }
 
     /**
-     * Add a legend to the content.
-     *
-     * @param  string $text
-     * @return $this
-     */
-    public function legend($text)
-    {
-        $this->attributes['legend'] = $text;
-
-        return $this;
-    }
-
-    /**
-     * Change to checkbox layout.
-     *
-     * @return $this
-     */
-    public function checkbox()
-    {
-        $this->checkboxLayout = true;
-
-        return $this;
-    }
-
-    /**
-     * Get an attribute.
-     *
-     * @param  string $key
-     * @param  mixed  $default
-     * @return mixed
-     */
-    public function getAttribute($key, $default = null)
-    {
-        $method = camel_case("get_{$key}_attribute");
-
-        if (method_exists($this, $method)) {
-            return $this->$method();
-        }
-
-        return array_get($this->attributes, $key, $default);
-    }
-
-    /**
-     * Magic getter wrapper.
-     *
-     * @param string $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->getAttribute($key);
-    }
-
-    /**
-     * Set an attribute.
-     *
-     * @param  string $key
-     * @param  mixed  $value
-     */
-    public function __set($key, $value)
-    {
-        return $this->setAttribute($key, $value);
-    }
-
-
-    /**
-     * Return the error attributes.
-     *
-     * @return string
-     */
-    public function getHasErrorAttribute()
-    {
-        return session()->has('errors')
-            && session('errors')->has($this->attributes['id']);
-    }
-
-    /**
-     * Return the controller class attribute.
-     *
-     * @return string
-     */
-    public function getControllClassAttribute()
-    {
-        $class = [$this->builder->controlClassBase];
-
-        if ($this->has_error) {
-            $class[] = "{$this->builder->controlClassBase}--invalid";
-        }
-
-        $class = array_merge($class, $this->attributes['attributes']);
-
-        return $class;
-    }
-
-    /**
-     * Return the class attribute.
-     *
-     * @return array
-     */
-    public function getGroupClassAttribute()
-    {
-        $class = [$this->builder->classBase];
-
-        if ($this->has_error) {
-            $class[] = "{$this->builder->classBase}--with-errors";
-        }
-
-        return $class;
-    }
-
-    /**
-     * Return the options attribute.
-     *
-     * @return array
-     */
-    public function getOptionsAttribute()
-    {
-        $options = $this->attributes['options'];
-
-        $class = [$this->builder->controlClassBase];
-
-        if ($this->has_error) {
-            $class[] = "{$this->builder->controlClassBase}--invalid";
-        }
-
-        if ($this->required) {
-            $options[] = 'required';
-        }
-
-        $options['class'] = implode(' ', array_merge(explode(' ', array_get($options, 'class', '')), $class));
-
-        return $options;
-    }
-
-    /**
-     * Get the HTML string.
+     * Return the HTML version of the group.
      *
      * @return string
      */
     public function toHtml()
     {
-        $attributes = app('html')->attributes(['class' => implode(' ', $this->group_class)]);
+        $base_class = config('html.base_class', 'form__group');
+        $group_class = $this->getGroupClass($base_class);
 
-        $content = ($this->content)($this->form, $this->id, $this->options);
-        $error = $this->getError($this->id);
-        $legend = $this->legend ? str_replace(':legend', $this->legend, $this->legendFormat) : '';
+        return view('html::group', array_merge(compact('base_class', 'group_class'), [
+            'label' => $this->label,
+            'name'  => $this->name,
+            'field' => $this->field,
+            'error' => $this->error,
+        ]));
+    }
 
-        if ($this->checkboxLayout) {
-            $html = "<label style=\"font-weight:normal\">{$content} <span>{$this->label}</span>{$error}</label>";
-        } else {
-            $label = $this->form->label($this->id, $this->label);
-            $html  = "<div class=\"{$this->builder->classBase}__label\">{$label}</div>";
-            $html .= "<div class=\"{$this->builder->classBase}__input\">{$content}{$legend}{$error}</div>";
+    /**
+     * Get the class group.
+     *
+     * @param  string $base
+     * @return string
+     */
+    public function getGroupClass($base)
+    {
+        $class = [$base];
+
+        if (! empty($this->error)) {
+            $class[] = "{$base}--with-error";
         }
 
-        return "<div{$attributes}>{$html}</div>";
+        if ($this->required) {
+            $class[] = "{$base}--required";
+        }
+
+        return implode(' ', $class);
+    }
+
+    /**
+     * Mark the field as required.
+     *
+     * @return void
+     */
+    public function required()
+    {
+        $this->required = true;
+        $this->field->required();
+
+        return $this;
     }
 
     /**
@@ -255,5 +161,19 @@ class FormGroup implements Htmlable
     public function __toString()
     {
         return $this->toHtml();
+    }
+
+    /**
+     * Pass everything unknown to the underlying field.
+     *
+     * @param  string $name
+     * @param  array  $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $this->field->{$name}(...$arguments);
+
+        return $this;
     }
 }

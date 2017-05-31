@@ -5,208 +5,140 @@ namespace Hpkns\Html;
 class FormBuilder extends \Collective\Html\FormBuilder
 {
     /**
-     * The base for the group class.
-     *
-     * @var string
-     */
-    public $classBase;
-
-    /**
-     * The base for the control class.
-     *
-     * @var string
-     */
-    public $controlClassBase;
-
-    /**
-     * The format for the form error feedback.
-     *
-     * @var string
-     */
-    public $errorFormat;
-
-    /**
-     * The format for the form field legend.
-     *
-     * @var string
-     */
-    public $legendFormat;
-
-    /**
-     * Initialize the formats.
-     *
-     * @param  string $class_base
-     * @param  string $control_class_base
-     * @param  string $error_format
-     * @param  string $legend_format
-     * @return void
-     */
-    public function setTemplates($class_base, $control_class_base, $error_format, $legend_format)
-    {
-        $this->classBase = $class_base;
-        $this->controlClassBase = $control_class_base;
-        $this->errorFormat = $error_format;
-        $this->legendFormat = $legend_format;
-    }
-
-    /**
      * Create a form group.
      *
-     * @param  string   $id
+     * @param  string   $name
      * @param  string   $label
      * @param  \Closure $content
-     * @param  array    $options
+     * @param  array    $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function group($id, $label, $content, $options = [])
+    public function group($name, $label, $content, $default, $attributes = [])
     {
-        return new FormGroup($this, $id, $label, $content, $options);
+        return new FormGroup($name, $label, $content, $default, $attributes);
     }
 
     /**
      * Create an input group.
      *
      * @param  string $type
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function inputGroup($type, $id, $label, $default = null, $options = [])
+    public function inputGroup($type, $name, $label, $default = null, $attributes = [])
     {
-        return $this->group($id, $label, function ($builder, $id, $options) use ($type, $default) {
-            return $builder->input($type, $id, $default, $options);
-        }, $options);
+        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($type) {
+            return $builder->input($type, $name, $default, $attributes);
+        }, $default, $attributes);
     }
 
     /**
      * Create an input group.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function checkboxGroup($id, $label, $default, $options = [])
+    public function checkboxGroup($name, $label, $default, $attributes = [])
     {
-        return $this->group($id, $label, function ($builder, $id, $options) use ($default) {
-            return $builder->checkbox($id, '1', $default, []);
-        }, $options)->checkbox();
+        return $this->group($name, $label, function ($builder, $name, $default, $attributes) {
+            return $builder->checkbox($name, '1', $default, []);
+        }, $default, $attributes)->checkbox();
     }
 
     /**
      * Create a text group.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function textGroup($id, $label, $default = null, $options = [])
+    public function textGroup($name, $label, $default = null, $attributes = [])
     {
-        return $this->inputGroup('text', $id, $label, $default, $options);
+        return $this->inputGroup('text', $name, $label, $default, $attributes);
     }
 
     /**
      * Create an email group.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function emailGroup($id, $label, $default = null, $options = [])
+    public function emailGroup($name, $label, $default = null, $attributes = [])
     {
-        return $this->inputGroup('email', $id, $label, $default, $options);
+        return $this->inputGroup('email', $name, $label, $default, $attributes);
     }
 
     /**
      * Create an date group.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function dateGroup($id, $label, $default = null, $options = [])
+    public function dateGroup($name, $label, $default = null, $attributes = [])
     {
-        return $this->inputGroup('date', $id, $label, $default, $options);
+        return $this->inputGroup('date', $name, $label, $default, $attributes);
     }
 
     /**
      * Create a text group.
      *
-     * @param  string $id
+     * @param  string $name
      * @param  string $label
      * @param  mixed  $default
-     * @param  array  $options
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function textareaGroup($id, $label, $default = null, $options = [])
+    public function textareaGroup($name, $label, $default = null, $attributes = [])
     {
-        return $this->group($id, $label, function ($builder, $id, $options) use ($default) {
-            return $builder->textarea($id, $default, $options);
-        }, $options);
+        return $this->group($name, $label, function ($builder, $name, $default, $attributes) {
+            return $builder->textarea($name, $default, $attributes);
+        }, $default, $attributes);
     }
 
     /**
      * Create a select group.
-     *
-     * @param  string $id
-     * @param  string $label
-     * @param  mixed  $default
-     * @param  array  $options
-     * @return \Illuminate\Support\HtmlString
-     */
-    public function selectGroup($id, $label, $values, $default = null, $options = [])
-    {
-        return $this->group($id, $label, function ($builder, $id, $options) use ($default, $values) {
-            return $builder->select($id, $values, $default, $options);
-        }, $options);
-    }
-
-    /**
-     * Create a select group.
-     *
-     * @param  string $id
-     * @param  string $label
-     * @param  mixed  $default
-     * @param  array  $options
-     * @return \Illuminate\Support\HtmlString
-     */
-    public function radioGroup($id, $label, $values, $default = null, $options = [])
-    {
-        return $this->group($id, $label, function ($builder, $id, $options) use ($default, $values) {
-            $html = '';
-            $old_value = old($id, $default);
-            foreach ($values as $value => $key) {
-                $checked = $old_value == $value ? ' checked' : '';
-                $html .= "<label><input type=\"radio\" name=\"{$id}\" value=\"{$value}\"{$checked}>{$key}</label>";
-            }
-            return $html;
-        }, $options);
-    }
-
-    /**
-     * Display an array of hidden values.
      *
      * @param  string $name
-     * @param  array $array
+     * @param  string $label
+     * @param  mixed  $default
+     * @param  array  $attributes
      * @return \Illuminate\Support\HtmlString
      */
-    public function hiddenArray($name, array $array = [])
+    public function selectGroup($name, $label, $values, $default = null, $attributes = [])
     {
-        $hiddens = [];
+        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($values) {
+            return $builder->select($name, $values, $default, $attributes);
+        }, $default, $attributes);
+    }
 
-        foreach ($array as $key => $value) {
-            $hiddens[] = (string)$this->input('hidden', "{$name}[{$key}]", $value);
-        }
-
-        return $this->toHtmlString(implode('', $hiddens));
+    /**
+     * Create a select group.
+     *
+     * @param  string $name
+     * @param  string $label
+     * @param  mixed  $default
+     * @param  array  $attributes
+     * @return \Illuminate\Support\HtmlString
+     */
+    public function radioGroup($name, $label, $values, $default = null, $attributes = [])
+    {
+        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($values) {
+            $old = $builder->getValueAttribute($name, $default);
+            return view('html::radio-group', compact('builder','old', 'name', 'attributes', 'values'));
+        }, $default, $attributes);
     }
 }

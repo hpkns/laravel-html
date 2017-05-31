@@ -2,17 +2,9 @@
 
 namespace Hpkns\Html\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use Collective\Html\HtmlFacade;
 
-class Html extends Facade
+class Html extends HtmlFacade
 {
-    /**
-     * Get the registered name of the component.
-     *
-     * @return string
-     */
-    protected static function getFacadeAccessor()
-    {
-        return 'html';
-    }
+    //
 }

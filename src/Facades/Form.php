@@ -2,17 +2,10 @@
 
 namespace Hpkns\Html\Facades;
 
-use Illuminate\Support\Facades\Facade;
+use Collective\Html\FormFacade;
 
-class Form extends Facade
+class Form extends FormFacade
 {
-    /**
-     * Get the registered name of the component.
-     *
-     * @return string
-     */
-    protected static function getFacadeAccessor()
-    {
-        return 'form';
-    }
+    //
 }
+
