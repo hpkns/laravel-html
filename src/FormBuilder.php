@@ -2,8 +2,12 @@
 
 namespace Hpkns\Html;
 
+use Illuminate\Support\Traits\Macroable;
+
 class FormBuilder extends \Collective\Html\FormBuilder
 {
+    use Macroable;
+
     /**
      * Create a form group.
      *
