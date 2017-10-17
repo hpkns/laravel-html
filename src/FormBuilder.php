@@ -142,8 +142,7 @@ class FormBuilder extends \Collective\Html\FormBuilder
     {
         return $this->group($name, $label, function ($name, $default, $attributes) use ($values) {
             $old = $this->getValueAttribute($name, $default);
-            $builder = $this;
-            return view('html::radio-group', compact('builder', 'old', 'name', 'attributes', 'values'));
+            return view('html::radio-group', ['builder' => $this] + compact('builder', 'old', 'name', 'attributes', 'values'));
         }, $default, $attributes);
     }
 }

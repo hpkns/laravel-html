@@ -56,7 +56,7 @@ class FormField implements Htmlable
      */
     public function toHtml()
     {
-        return call_user_func_array(Closure::bind($this->content, app('form'), FormBuilder::class), $this->attributes);
+        return call_user_func_array(\Closure::bind($this->content, app('form'), FormBuilder::class), $this->attributes);
     }
 
     /**
