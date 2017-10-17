@@ -34,8 +34,8 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function inputGroup($type, $name, $label, $default = null, $attributes = [])
     {
-        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($type) {
-            return $builder->input($type, $name, $default, $attributes);
+        return $this->group($name, $label, function ($name, $default, $attributes) use ($type) {
+            return $this->input($type, $name, $default, $attributes);
         }, $default, $attributes);
     }
 
@@ -50,8 +50,8 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function checkboxGroup($name, $label, $default, $attributes = [])
     {
-        return $this->group($name, $label, function ($builder, $name, $default, $attributes) {
-            return $builder->checkbox($name, '1', $default, []);
+        return $this->group($name, $label, function ($name, $default, $attributes) {
+            return $this->checkbox($name, '1', $default, []);
         }, $default, $attributes)->checkbox();
     }
 
@@ -108,8 +108,8 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function textareaGroup($name, $label, $default = null, $attributes = [])
     {
-        return $this->group($name, $label, function ($builder, $name, $default, $attributes) {
-            return $builder->textarea($name, $default, $attributes);
+        return $this->group($name, $label, function ($name, $default, $attributes) {
+            return $this->textarea($name, $default, $attributes);
         }, $default, $attributes);
     }
 
@@ -124,8 +124,8 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function selectGroup($name, $label, $values, $default = null, $attributes = [])
     {
-        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($values) {
-            return $builder->select($name, $values, $default, $attributes);
+        return $this->group($name, $label, function ($name, $default, $attributes) use ($values) {
+            return $this->select($name, $values, $default, $attributes);
         }, $default, $attributes);
     }
 
@@ -140,9 +140,10 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function radioGroup($name, $label, $values, $default = null, $attributes = [])
     {
-        return $this->group($name, $label, function ($builder, $name, $default, $attributes) use ($values) {
-            $old = $builder->getValueAttribute($name, $default);
-            return view('html::radio-group', compact('builder','old', 'name', 'attributes', 'values'));
+        return $this->group($name, $label, function ($name, $default, $attributes) use ($values) {
+            $old = $this->getValueAttribute($name, $default);
+            $builder = $this;
+            return view('html::radio-group', compact('builder', 'old', 'name', 'attributes', 'values'));
         }, $default, $attributes);
     }
 }
