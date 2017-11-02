@@ -19,6 +19,10 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function group($name, $label, $content, $default, $attributes = [])
     {
+        if (!empty($name) && ! in_array($name, $this->labels)) {
+            $this->labels[] = $name;
+        }
+
         return new FormGroup($name, $label, $content, $default, $attributes);
     }
 
@@ -50,8 +54,8 @@ class FormBuilder extends \Collective\Html\FormBuilder
      */
     public function checkboxGroup($name, $label, $default, $attributes = [])
     {
-        return $this->group($name, $label, function ($name, $default, $attributes) {
-            return $this->checkbox($name, '1', $default, []);
+        return $this->group($name, null, function ($name, $default, $attributes) use ($label) {
+            return "<label>" . $this->checkbox($name, '1', $default, []) . " {$label}</label>";
         }, $default, $attributes)->checkbox();
     }
 
